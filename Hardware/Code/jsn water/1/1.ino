@@ -1,82 +1,103 @@
-// =========================================
-// UNDERWATER STEP3 (POOL-STABLE) — 1 SENSOR
-// time_ms,echo_us,valid,dist_cm,dist_f_cm,safe_ref_cm,in_danger,danger,event
-// event: +1 entered danger, -1 exited danger, 0 none
-// =========================================
+// ============================================================
+// ESP32 + 4x JSN-SR04T (UNDERWATER) — FULL SCAN FOR JETSON/SNN
+// Sensors:
+//   0 CENTER: TRIG 5  ECHO 19
+//   1 DOWN  : TRIG 17 ECHO 21
+//   2 RIGHT : TRIG 16 ECHO 22
+//   3 LEFT  : TRIG 25 ECHO 18
+//
+// CSV (one line per full scan):
+// t_ms, dC,dD,dR,dL, sC,sD,sR,sL, eC,eD,eR,eL
+// ============================================================
 
-#define TRIG_PIN 5
-#define ECHO_PIN 18
+#include <Arduino.h>
+#include <math.h>
 
-const int   SAMPLE_PERIOD_MS = 200;
+#define N_SENS 4
+
+// Order: Center, Down, Right, Left
+int TRIG_PIN[N_SENS] = { 5, 17, 16, 25 };
+int ECHO_PIN[N_SENS] = { 19, 21, 22, 18 };
+
+// ---------- Timing ----------
 const int   TRIG_HIGH_US     = 25;
-const long  TIMEOUT_US       = 60000;
+const long  TIMEOUT_US       = 20000;   // reduce long multipath (20ms)
+const int   SCAN_PERIOD_MS   = 250;     // ~4 Hz full scan
+const int   BETWEEN_SENS_MS  = 35;      // quiet time between sensors
 
-const long  ECHO_MIN_US      = 250;
-const long  ECHO_MAX_US      = 30000;
+// Median-of-N (keep light for 4 sensors)
+const int   NPINGS       = 3;
+const int   INTERPING_MS = 12;
 
-const int   NPINGS           = 7;
-const int   INTERPING_MS     = 35;
+// ---------- Echo sanity ----------
+const long  ECHO_MIN_US = 250;
+const long  ECHO_MAX_US = 30000;
 
-const float CM_PER_US_ONEWAY = 0.148f;  // underwater speed-of-sound approx
-const float MIN_DIST_CM      = 20.0f;
-const float MAX_DIST_CM      = 600.0f;
+// Underwater speed approx
+const float CM_PER_US_ONEWAY = 0.148f;
 
+// Clamp
+const float MIN_DIST_CM = 20.0f;
+const float MAX_DIST_CM = 600.0f;
+
+// Filter
 const float DIST_EMA_A       = 0.25f;
+const float DROP_REJECT_FRAC = 0.35f;
+const int   DROP_STRIKE_NEED = 2;        // 2-strike: accept real drops
 
-// ---- YOU choose these ----
-const float SAFE_DIST_CM     = 120.0f;  // danger if <= this
-const float HYST_CM          = 20.0f;   // must go above SAFE+HYST to exit
+// ---------- Baseline ----------
+const int   BASELINE_SAMPLES = 25;
+const float BASELINE_STABLE_BAND_CM = 12.0f;
+const int   BASELINE_STABLE_NEED    = 10;
 
-// ---- Confirmation to avoid false triggers ----
-const int   CONF_N           = 3;       // window size
-const int   ENTER_K          = 2;       // need >=2/3 below threshold to enter
-const int   EXIT_K           = 2;       // need >=2/3 above (SAFE+HYST) to exit
+// Baseline tracking when safe (pool robustness)
+const float BASELINE_TRACK_A   = 0.02f;
+const float BASELINE_MAX_STEP  = 6.0f;
 
-// ---- Outlier reject (anti-multipath) ----
-const float DROP_REJECT_FRAC = 0.40f;   // reject if dist drops by >40% suddenly
+// Danger thresholds relative to baseline
+const float DANGER_MARGIN_CM = 60.0f;
+const float HYST_CM          = 20.0f;
 
-// ---- Optional reference (logging only) ----
-const int   CAL_SAMPLES      = 30;
-int cal_n = 0;
-float safe_ref_cm = 0.0f;
+// confirmation window
+const int CONF_N  = 5;
+const int ENTER_K = 4;
+const int EXIT_K  = 4;
 
-bool  dist_init = false;
-float dist_f_cm = 0.0f;
-
-bool  in_danger = false;
-
-// history of filtered distances
-float hist[CONF_N];
-int   hist_i = 0;
-int   hist_count = 0;
+// ============================================================
 
 float clampf(float x, float lo, float hi) { return (x < lo) ? lo : (x > hi) ? hi : x; }
 
-void sortArray(long *a, int n) {
+void sortLong(long *a, int n) {
   for (int i = 0; i < n - 1; i++)
     for (int j = i + 1; j < n; j++)
       if (a[j] < a[i]) { long t = a[i]; a[i] = a[j]; a[j] = t; }
 }
 
-long readEchoOnce() {
-  digitalWrite(TRIG_PIN, LOW);
-  delayMicroseconds(5);
-  digitalWrite(TRIG_PIN, HIGH);
-  delayMicroseconds(TRIG_HIGH_US);
-  digitalWrite(TRIG_PIN, LOW);
-  return pulseIn(ECHO_PIN, HIGH, TIMEOUT_US);
+void sortFloat(float *a, int n) {
+  for (int i = 0; i < n - 1; i++)
+    for (int j = i + 1; j < n; j++)
+      if (a[j] < a[i]) { float t = a[i]; a[i] = a[j]; a[j] = t; }
 }
 
-long readEchoMedian() {
+long readEchoOnce(int trigPin, int echoPin) {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(TRIG_HIGH_US);
+  digitalWrite(trigPin, LOW);
+  return pulseIn(echoPin, HIGH, TIMEOUT_US);
+}
+
+long readEchoMedian(int trigPin, int echoPin) {
   long vals[NPINGS];
   int k = 0;
   for (int i = 0; i < NPINGS; i++) {
-    long e = readEchoOnce();
+    long e = readEchoOnce(trigPin, echoPin);
     if (e >= ECHO_MIN_US && e <= ECHO_MAX_US) vals[k++] = e;
     delay(INTERPING_MS);
   }
   if (k == 0) return 0;
-  sortArray(vals, k);
+  sortLong(vals, k);
   return vals[k / 2];
 }
 
@@ -84,105 +105,193 @@ float echoToDistCm(long echo_us) {
   return (echo_us * CM_PER_US_ONEWAY) / 2.0f;
 }
 
-void pushHist(float x) {
-  hist[hist_i] = x;
-  hist_i = (hist_i + 1) % CONF_N;
-  if (hist_count < CONF_N) hist_count++;
+float dangerScore(float dist_f, float enter_thr) {
+  const float WIDTH = 120.0f;
+  if (dist_f <= enter_thr) return 1.0f;
+  if (dist_f >= enter_thr + WIDTH) return 0.0f;
+  return 1.0f - (dist_f - enter_thr) / WIDTH;
 }
 
-int countBelow(float thr) {
+struct SensorState {
+  bool  dist_init = false;
+  float dist_f_cm = 0.0f;
+
+  // baseline
+  bool  baseline_ready = false;
+  int   base_n = 0;
+  float base_buf[BASELINE_SAMPLES];
+  float baseline_cm = 0.0f;
+
+  // stability gate
+  float stable_ref = 0.0f;
+  int   stable_count = 0;
+
+  // danger
+  bool  in_danger = false;
+  float hist[CONF_N];
+  int   hist_i = 0;
+  int   hist_count = 0;
+
+  // 2-strike drop
+  int   drop_strikes = 0;
+};
+
+SensorState ST[N_SENS];
+
+bool baselineAccept(SensorState &st, float x) {
+  if (st.stable_count == 0) {
+    st.stable_ref = x;
+    st.stable_count = 1;
+    return false;
+  }
+  if (fabsf(x - st.stable_ref) <= BASELINE_STABLE_BAND_CM) {
+    st.stable_ref = 0.8f * st.stable_ref + 0.2f * x;
+    st.stable_count++;
+  } else {
+    st.stable_ref = x;
+    st.stable_count = 1;
+  }
+  return (st.stable_count >= BASELINE_STABLE_NEED);
+}
+
+void pushHist(SensorState &st, float x) {
+  st.hist[st.hist_i] = x;
+  st.hist_i = (st.hist_i + 1) % CONF_N;
+  if (st.hist_count < CONF_N) st.hist_count++;
+}
+
+int countBelow(const SensorState &st, float thr) {
   int c = 0;
-  for (int i = 0; i < hist_count; i++) if (hist[i] <= thr) c++;
+  for (int i = 0; i < st.hist_count; i++) if (st.hist[i] <= thr) c++;
   return c;
 }
 
-int countAbove(float thr) {
+int countAbove(const SensorState &st, float thr) {
   int c = 0;
-  for (int i = 0; i < hist_count; i++) if (hist[i] >= thr) c++;
+  for (int i = 0; i < st.hist_count; i++) if (st.hist[i] >= thr) c++;
   return c;
 }
 
 void setup() {
   Serial.begin(115200);
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT_PULLDOWN);
-  delay(500);
+  delay(300);
 
-  Serial.println("UNDERWATER STEP3: time_ms,echo_us,valid,dist_cm,dist_f_cm,safe_ref_cm,in_danger,danger,event");
-  Serial.println("Point into OPEN water for a few seconds, then test with a flat obstacle.");
+  for (int i = 0; i < N_SENS; i++) {
+    pinMode(TRIG_PIN[i], OUTPUT);
+    digitalWrite(TRIG_PIN[i], LOW);
+    pinMode(ECHO_PIN[i], INPUT);  // IMPORTANT: level shift ECHO to 3.3V
+  }
+
+  Serial.println("t_ms,dC,dD,dR,dL,sC,sD,sR,sL,eC,eD,eR,eL");
+  Serial.println("# Calibrate: keep robot in FINAL pose for ~6-8s, then test obstacles.");
 }
 
 void loop() {
-  unsigned long t = millis();
+  unsigned long t0 = millis();
 
-  long echo_us = readEchoMedian();
-  bool valid = (echo_us != 0);
+  float dangerOut[N_SENS] = {0};
+  int   stateOut[N_SENS]  = {0};
+  int   eventOut[N_SENS]  = {0};
 
-  float dist_cm = 0.0f;
-  int event = 0;
-  float danger = 0.0f;
+  for (int i = 0; i < N_SENS; i++) {
+    SensorState &st = ST[i];
 
-  if (valid) {
-    dist_cm = clampf(echoToDistCm(echo_us), MIN_DIST_CM, MAX_DIST_CM);
+    long echo_us = readEchoMedian(TRIG_PIN[i], ECHO_PIN[i]);
+    bool valid = (echo_us != 0);
 
-    if (!dist_init) {
-      dist_f_cm = dist_cm;
-      dist_init = true;
-    } else {
-      // anti-multipath: reject sudden huge drop
-      if (dist_cm < dist_f_cm * (1.0f - DROP_REJECT_FRAC)) {
-        // ignore this reading (keep previous dist_f)
+    eventOut[i] = 0;
+
+    if (valid) {
+      float dist_cm = clampf(echoToDistCm(echo_us), MIN_DIST_CM, MAX_DIST_CM);
+
+      // ---- Filter with 2-strike drop handling ----
+      if (!st.dist_init) {
+        st.dist_f_cm = dist_cm;
+        st.dist_init = true;
+        st.drop_strikes = 0;
       } else {
-        dist_f_cm = DIST_EMA_A * dist_cm + (1.0f - DIST_EMA_A) * dist_f_cm;
+        float reject_limit = st.dist_f_cm * (1.0f - DROP_REJECT_FRAC);
+        if (dist_cm < reject_limit) {
+          st.drop_strikes++;
+          if (st.drop_strikes >= DROP_STRIKE_NEED) {
+            st.dist_f_cm = DIST_EMA_A * dist_cm + (1.0f - DIST_EMA_A) * st.dist_f_cm;
+            st.drop_strikes = DROP_STRIKE_NEED;
+          }
+        } else {
+          st.drop_strikes = 0;
+          st.dist_f_cm = DIST_EMA_A * dist_cm + (1.0f - DIST_EMA_A) * st.dist_f_cm;
+        }
       }
-    }
 
-    // log-only safe reference
-    if (cal_n < CAL_SAMPLES) {
-      safe_ref_cm = (cal_n == 0) ? dist_f_cm : (0.85f * safe_ref_cm + 0.15f * dist_f_cm);
-      cal_n++;
-    }
+      // ---- Baseline learning ----
+      if (!st.baseline_ready) {
+        bool ok = baselineAccept(st, st.dist_f_cm);
+        if (ok) st.base_buf[st.base_n++] = st.dist_f_cm;
 
-    // confirmation window for state transitions
-    pushHist(dist_f_cm);
+        if (st.base_n >= BASELINE_SAMPLES) {
+          sortFloat(st.base_buf, BASELINE_SAMPLES);
+          st.baseline_cm = st.base_buf[BASELINE_SAMPLES / 2];
+          st.baseline_ready = true;
 
-    if (!in_danger) {
-      if (hist_count == CONF_N && countBelow(SAFE_DIST_CM) >= ENTER_K) {
-        in_danger = true;
-        event = +1; // entered danger (one-time pulse)
+          st.in_danger = false;
+          st.hist_count = 0;
+          st.hist_i = 0;
+          st.drop_strikes = 0;
+        }
+
+        dangerOut[i] = 0.0f;
+        stateOut[i]  = 0;
+        delay(BETWEEN_SENS_MS);
+        continue;
       }
+
+      // ---- baseline tracking when safe ----
+      if (!st.in_danger) {
+        float delta = st.dist_f_cm - st.baseline_cm;
+        delta = clampf(delta, -BASELINE_MAX_STEP, BASELINE_MAX_STEP);
+        st.baseline_cm += BASELINE_TRACK_A * delta;
+      }
+
+      float enter_thr = clampf(st.baseline_cm - DANGER_MARGIN_CM, MIN_DIST_CM, MAX_DIST_CM);
+      float exit_thr  = clampf(enter_thr + HYST_CM, MIN_DIST_CM, MAX_DIST_CM);
+
+      pushHist(st, st.dist_f_cm);
+
+      if (!st.in_danger) {
+        if (st.hist_count == CONF_N && countBelow(st, enter_thr) >= ENTER_K) {
+          st.in_danger = true;
+          eventOut[i] = +1;
+        }
+      } else {
+        if (st.hist_count == CONF_N && countAbove(st, exit_thr) >= EXIT_K) {
+          st.in_danger = false;
+          eventOut[i] = -1;
+        }
+      }
+
+      dangerOut[i] = st.in_danger ? dangerScore(st.dist_f_cm, enter_thr) : 0.0f;
+      stateOut[i]  = st.in_danger ? 1 : 0;
+
     } else {
-      if (hist_count == CONF_N && countAbove(SAFE_DIST_CM + HYST_CM) >= EXIT_K) {
-        in_danger = false;
-        event = -1; // exited danger (one-time pulse)
-      }
+      // invalid echo -> don't force danger
+      dangerOut[i] = 0.0f;
+      stateOut[i]  = ST[i].in_danger ? 1 : 0;
+      eventOut[i]  = 0;
     }
 
-    // danger value for logging/steering
-    if (in_danger) {
-      // 1 at/under SAFE, then decreases as you go away
-      float far = SAFE_DIST_CM + 100.0f; // tune slope width
-      danger = (dist_f_cm <= SAFE_DIST_CM) ? 1.0f :
-               (dist_f_cm >= far) ? 0.0f :
-               1.0f - (dist_f_cm - SAFE_DIST_CM) / (far - SAFE_DIST_CM);
-    } else {
-      danger = 0.0f; // IMPORTANT: open water should show 0
-    }
-  } else {
-    // invalid echo: keep state, do not force danger
+    delay(BETWEEN_SENS_MS);
   }
 
-  Serial.print(t); Serial.print(",");
-  Serial.print(echo_us); Serial.print(",");
-  Serial.print(valid ? 1 : 0); Serial.print(",");
-  Serial.print(valid ? dist_cm : 0.0f, 1); Serial.print(",");
-  Serial.print(dist_f_cm, 1); Serial.print(",");
-  Serial.print((cal_n >= CAL_SAMPLES) ? safe_ref_cm : 0.0f, 1); Serial.print(",");
-  Serial.print(in_danger ? 1 : 0); Serial.print(",");
-  Serial.print(danger, 3); Serial.print(",");
-  Serial.println(event);
+  // Print one scan line
+  Serial.print(t0);
+  for (int i = 0; i < N_SENS; i++) { Serial.print(","); Serial.print(dangerOut[i], 3); }
+  for (int i = 0; i < N_SENS; i++) { Serial.print(","); Serial.print(stateOut[i]); }
+  for (int i = 0; i < N_SENS; i++) { Serial.print(","); Serial.print(eventOut[i]); }
+  Serial.println();
 
-  delay(SAMPLE_PERIOD_MS);
+  // hold scan rate
+  unsigned long spent = millis() - t0;
+  if (spent < (unsigned long)SCAN_PERIOD_MS) delay(SCAN_PERIOD_MS - spent);
 }
 
 
