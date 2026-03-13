@@ -270,4 +270,4 @@ if __name__ == "__main__":
         window_df = df.iloc[i: i + window_size]
         label, conf = predictor.predict(window_df)
         time_ms = window_df["time_ms"].iloc[-1]
-        print(f"  t={time_ms:>10} ms  →  {label:<6s}  (confidence: {conf:.4f})")
+        print(f"  t={time_ms:>10} ms  ->  {label:<6s}  (confidence: {conf:.4f})")
