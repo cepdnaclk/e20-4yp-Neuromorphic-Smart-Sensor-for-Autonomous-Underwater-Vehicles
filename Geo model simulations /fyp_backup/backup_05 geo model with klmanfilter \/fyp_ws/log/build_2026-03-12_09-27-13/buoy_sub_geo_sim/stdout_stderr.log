@@ -1,0 +1,29 @@
+running develop
+running egg_info
+creating buoy_sub_geo_sim.egg-info
+writing buoy_sub_geo_sim.egg-info/PKG-INFO
+writing dependency_links to buoy_sub_geo_sim.egg-info/dependency_links.txt
+writing entry points to buoy_sub_geo_sim.egg-info/entry_points.txt
+writing requirements to buoy_sub_geo_sim.egg-info/requires.txt
+writing top-level names to buoy_sub_geo_sim.egg-info/top_level.txt
+writing manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+reading manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+writing manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+running build_ext
+Creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy-sub-geo-sim.egg-link (link to .)
+Installing auto_runner script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing geo_estimator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing logger_node script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing measurement_generator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+
+Installed /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim
+running symlink_data
+creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index
+creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index
+creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/resource/buoy_sub_geo_sim -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/package.xml -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim
+creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/launch/auto_sim.launch.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds
+symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/worlds/ocean_world.sdf -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds

@@ -1,0 +1,5 @@
+[console_scripts]
+auto_runner = buoy_sub_geo_sim.auto_runner:main
+geo_estimator = buoy_sub_geo_sim.geo_estimator:main
+logger_node = buoy_sub_geo_sim.logger_node:main
+measurement_generator = buoy_sub_geo_sim.measurement_generator:main

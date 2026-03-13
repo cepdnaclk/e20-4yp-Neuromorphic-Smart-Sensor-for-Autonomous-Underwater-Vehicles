@@ -1,0 +1,4 @@
+[console_scripts]
+evaluator = buoy_sub_geo_sim.evaluator:main
+fake_buoy_gps = buoy_sub_geo_sim.fake_buoy_gps:main
+geo_estimator = buoy_sub_geo_sim.geo_estimator:main

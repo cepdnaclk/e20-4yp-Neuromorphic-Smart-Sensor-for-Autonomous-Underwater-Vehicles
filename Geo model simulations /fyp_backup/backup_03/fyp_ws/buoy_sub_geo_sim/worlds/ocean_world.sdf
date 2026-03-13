@@ -1,0 +1,144 @@
+<?xml version="1.0" ?>
+<sdf version="1.9">
+  <world name="ocean_world">
+
+    <!-- Core world systems -->
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics"/>
+
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster"/>
+
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands"/>
+
+    <!-- Gravity -->
+    <gravity>0 0 -9.81</gravity>
+
+    <!-- Water surface visual -->
+    <model name="water_surface">
+      <static>true</static>
+      <pose>0 0 0 0 0 0</pose>
+      <link name="link">
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>200 200 0.02</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.1 0.3 0.8 0.4</ambient>
+            <diffuse>0.1 0.3 0.8 0.4</diffuse>
+          </material>
+        </visual>
+      </link>
+    </model>
+
+    <!-- Buoy -->
+    <model name="buoy">
+      <static>true</static>
+      <pose>0 0 0.3 0 0 0</pose>
+
+      <link name="base_link">
+        <inertial>
+          <mass>10.0</mass>
+          <inertia>
+            <ixx>1.0</ixx><iyy>1.0</iyy><izz>1.0</izz>
+            <ixy>0.0</ixy><ixz>0.0</ixz><iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <cylinder>
+              <radius>0.25</radius>
+              <length>0.6</length>
+            </cylinder>
+          </geometry>
+          <material>
+            <ambient>1 0.6 0 1</ambient>
+            <diffuse>1 0.6 0 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <plugin
+        filename="gz-sim-odometry-publisher-system"
+        name="gz::sim::systems::OdometryPublisher">
+        <dimensions>3</dimensions>
+        <odom_publish_frequency>30</odom_publish_frequency>
+        <odom_topic>/model/buoy/odometry</odom_topic>
+        <odom_frame>world</odom_frame>
+        <robot_base_frame>buoy/base_link</robot_base_frame>
+      </plugin>
+    </model>
+
+    <!-- Submarine -->
+    <model name="submarine">
+      <static>true</static>
+      <pose>5 0 -8 0 0 0</pose>
+
+      <link name="base_link">
+        <inertial>
+          <mass>25.0</mass>
+          <inertia>
+            <ixx>2.0</ixx><iyy>2.0</iyy><izz>2.0</izz>
+            <ixy>0.0</ixy><ixz>0.0</ixz><iyz>0.0</iyz>
+          </inertia>
+        </inertial>
+
+        <collision name="collision">
+          <geometry>
+            <box>
+              <size>1.4 0.5 0.4</size>
+            </box>
+          </geometry>
+        </collision>
+
+        <visual name="visual">
+          <geometry>
+            <box>
+              <size>1.4 0.5 0.4</size>
+            </box>
+          </geometry>
+          <material>
+            <ambient>0.2 0.2 0.2 1</ambient>
+            <diffuse>0.2 0.2 0.2 1</diffuse>
+          </material>
+        </visual>
+      </link>
+
+      <plugin
+        filename="gz-sim-odometry-publisher-system"
+        name="gz::sim::systems::OdometryPublisher">
+        <dimensions>3</dimensions>
+        <odom_publish_frequency>30</odom_publish_frequency>
+        <odom_topic>/model/submarine/odometry</odom_topic>
+        <odom_frame>world</odom_frame>
+        <robot_base_frame>submarine/base_link</robot_base_frame>
+      </plugin>
+    </model>
+
+    <!-- Sun -->
+    <light name="sun" type="directional">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 20 0 0 0</pose>
+      <diffuse>1 1 1 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <direction>-0.5 0.1 -1</direction>
+    </light>
+
+  </world>
+</sdf>
