@@ -1,0 +1,23 @@
+running egg_info
+writing ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/PKG-INFO
+writing dependency_links to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/dependency_links.txt
+writing entry points to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/entry_points.txt
+writing requirements to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/requires.txt
+writing top-level names to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/top_level.txt
+reading manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+writing manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+running build
+running build_py
+running install
+running install_lib
+running install_data
+copying launch/auto_sim.launch.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+running install_egg_info
+removing '/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info' (and everything under it)
+Copying ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info
+running install_scripts
+Installing auto_runner script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing geo_estimator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing logger_node script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+Installing measurement_generator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+writing list of installed files to '/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log'

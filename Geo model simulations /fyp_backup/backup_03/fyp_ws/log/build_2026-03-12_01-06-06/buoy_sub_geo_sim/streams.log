@@ -1,0 +1,24 @@
+[0.704s] Invoking command in '/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/buoy_sub_geo_sim': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data
+[0.922s] running egg_info
+[0.938s] writing ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/PKG-INFO
+[0.938s] writing dependency_links to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/dependency_links.txt
+[0.939s] writing entry points to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/entry_points.txt
+[0.939s] writing requirements to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/requires.txt
+[0.939s] writing top-level names to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/top_level.txt
+[0.971s] reading manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[0.971s] writing manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[0.972s] running build
+[0.972s] running build_py
+[0.972s] running install
+[0.978s] running install_lib
+[0.995s] running install_data
+[0.995s] running install_egg_info
+[1.012s] removing '/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info' (and everything under it)
+[1.013s] Copying ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info to /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info
+[1.013s] running install_scripts
+[1.123s] Installing auto_runner script to /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.124s] Installing geo_estimator script to /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.124s] Installing logger_node script to /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.124s] Installing measurement_generator script to /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.124s] writing list of installed files to '/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/install.log'
+[1.159s] Invoked command in '/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/buoy_sub_geo_sim' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_backup/backup_03/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data

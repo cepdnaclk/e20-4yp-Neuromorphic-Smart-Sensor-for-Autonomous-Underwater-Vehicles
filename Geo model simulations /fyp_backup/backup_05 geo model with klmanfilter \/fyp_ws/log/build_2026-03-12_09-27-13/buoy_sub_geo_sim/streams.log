@@ -1,0 +1,31 @@
+[0.705s] Invoking command in '/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build --no-deps symlink_data
+[0.977s] running develop
+[1.140s] running egg_info
+[1.140s] creating buoy_sub_geo_sim.egg-info
+[1.156s] writing buoy_sub_geo_sim.egg-info/PKG-INFO
+[1.156s] writing dependency_links to buoy_sub_geo_sim.egg-info/dependency_links.txt
+[1.156s] writing entry points to buoy_sub_geo_sim.egg-info/entry_points.txt
+[1.156s] writing requirements to buoy_sub_geo_sim.egg-info/requires.txt
+[1.156s] writing top-level names to buoy_sub_geo_sim.egg-info/top_level.txt
+[1.156s] writing manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[1.190s] reading manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[1.190s] writing manifest file 'buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[1.209s] running build_ext
+[1.209s] Creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy-sub-geo-sim.egg-link (link to .)
+[1.209s] Installing auto_runner script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.210s] Installing geo_estimator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.210s] Installing logger_node script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.210s] Installing measurement_generator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.210s] 
+[1.210s] Installed /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim
+[1.210s] running symlink_data
+[1.211s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index
+[1.211s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index
+[1.211s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+[1.211s] symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/resource/buoy_sub_geo_sim -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+[1.211s] symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/package.xml -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim
+[1.211s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+[1.211s] symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/launch/auto_sim.launch.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+[1.212s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds
+[1.212s] symbolically linking /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/worlds/ocean_world.sdf -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds
+[1.268s] Invoked command in '/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build --no-deps symlink_data

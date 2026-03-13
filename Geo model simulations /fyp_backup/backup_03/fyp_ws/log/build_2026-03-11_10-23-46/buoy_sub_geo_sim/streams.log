@@ -1,0 +1,40 @@
+[0.740s] Invoking command in '/home/heshan-sidantha/fyp_ws/buoy_sub_geo_sim': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data
+[0.960s] running egg_info
+[0.976s] writing ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/PKG-INFO
+[0.977s] writing dependency_links to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/dependency_links.txt
+[0.977s] writing entry points to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/entry_points.txt
+[0.977s] writing requirements to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/requires.txt
+[0.977s] writing top-level names to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/top_level.txt
+[1.010s] reading manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[1.010s] writing manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[1.011s] running build
+[1.011s] running build_py
+[1.011s] copying buoy_sub_geo_sim/measurement_generator.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[1.011s] copying buoy_sub_geo_sim/auto_runner.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[1.012s] copying buoy_sub_geo_sim/logger_node.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[1.012s] copying buoy_sub_geo_sim/geo_model.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[1.012s] copying buoy_sub_geo_sim/geo_estimator.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[1.012s] running install
+[1.017s] running install_lib
+[1.033s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/measurement_generator.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[1.034s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/auto_runner.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[1.034s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/logger_node.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[1.034s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/geo_model.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[1.035s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/geo_estimator.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[1.035s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/measurement_generator.py to measurement_generator.cpython-312.pyc
+[1.035s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/auto_runner.py to auto_runner.cpython-312.pyc
+[1.036s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/logger_node.py to logger_node.cpython-312.pyc
+[1.037s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/geo_model.py to geo_model.cpython-312.pyc
+[1.037s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/geo_estimator.py to geo_estimator.cpython-312.pyc
+[1.038s] running install_data
+[1.038s] copying launch/auto_sim.launch.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+[1.038s] running install_egg_info
+[1.056s] removing '/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info' (and everything under it)
+[1.056s] Copying ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info
+[1.056s] running install_scripts
+[1.168s] Installing auto_runner script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.169s] Installing geo_estimator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.169s] Installing logger_node script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.169s] Installing measurement_generator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.169s] writing list of installed files to '/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log'
+[1.203s] Invoked command in '/home/heshan-sidantha/fyp_ws/buoy_sub_geo_sim' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data

@@ -1,0 +1,7 @@
+Metadata-Version: 2.1
+Name: buoy-sub-geo-sim
+Version: 0.0.1
+Summary: Buoy + submarine + geo model simulation in Gazebo and ROS 2
+Maintainer: you
+Maintainer-email: you@example.com
+License: Apache-2.0

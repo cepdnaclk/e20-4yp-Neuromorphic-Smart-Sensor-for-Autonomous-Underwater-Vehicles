@@ -1,0 +1,49 @@
+[0.688s] Invoking command in '/home/heshan-sidantha/fyp_ws/buoy_sub_geo_sim': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data
+[0.909s] running egg_info
+[0.909s] creating ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info
+[0.925s] writing ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/PKG-INFO
+[0.925s] writing dependency_links to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/dependency_links.txt
+[0.925s] writing entry points to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/entry_points.txt
+[0.926s] writing requirements to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/requires.txt
+[0.926s] writing top-level names to ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/top_level.txt
+[0.926s] writing manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[0.958s] reading manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[0.959s] writing manifest file '../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info/SOURCES.txt'
+[0.959s] running build
+[0.959s] running build_py
+[0.959s] creating /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build
+[0.960s] creating /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib
+[0.960s] creating /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[0.960s] copying buoy_sub_geo_sim/__init__.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[0.960s] copying buoy_sub_geo_sim/fake_buoy_gps.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[0.960s] copying buoy_sub_geo_sim/geo_estimator.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[0.960s] copying buoy_sub_geo_sim/evaluator.py -> /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim
+[0.960s] running install
+[0.965s] running install_lib
+[0.982s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[0.982s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/__init__.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[0.982s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/fake_buoy_gps.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[0.983s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/geo_estimator.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[0.983s] copying /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build/lib/buoy_sub_geo_sim/evaluator.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim
+[0.983s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/__init__.py to __init__.cpython-312.pyc
+[0.983s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/fake_buoy_gps.py to fake_buoy_gps.cpython-312.pyc
+[0.983s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/geo_estimator.py to geo_estimator.cpython-312.pyc
+[0.984s] byte-compiling /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim/evaluator.py to evaluator.cpython-312.pyc
+[0.985s] running install_data
+[0.985s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index
+[0.985s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index
+[0.985s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+[0.985s] copying resource/buoy_sub_geo_sim -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/ament_index/resource_index/packages
+[0.986s] copying package.xml -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim
+[0.986s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+[0.986s] copying launch/sim.launch.py -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/launch
+[0.986s] creating /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds
+[0.987s] copying worlds/ocean_world.sdf -> /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/share/buoy_sub_geo_sim/worlds
+[0.987s] running install_egg_info
+[1.003s] Copying ../build/buoy_sub_geo_sim/buoy_sub_geo_sim.egg-info to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages/buoy_sub_geo_sim-0.0.1-py3.12.egg-info
+[1.004s] running install_scripts
+[1.115s] Installing evaluator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.115s] Installing fake_buoy_gps script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.115s] Installing geo_estimator script to /home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/buoy_sub_geo_sim
+[1.116s] writing list of installed files to '/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log'
+[1.149s] Invoked command in '/home/heshan-sidantha/fyp_ws/buoy_sub_geo_sim' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/heshan-sidantha/fyp_ws/install/buoy_sub_geo_sim/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../build/buoy_sub_geo_sim build --build-base /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/build install --record /home/heshan-sidantha/fyp_ws/build/buoy_sub_geo_sim/install.log --single-version-externally-managed install_data
