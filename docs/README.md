@@ -9,18 +9,17 @@ title:
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
 
-# Project Title
+# Neuromorphic Smart Sensor for Autonomous Underwater Vehicles
 
 #### Team
 
-- eNumber, Name, [email](mailto:name@email.com)
-- eNumber, Name, [email](mailto:name@email.com)
-- eNumber, Name, [email](mailto:name@email.com)
+- E/20/036, Name, [email](mailto:e20036@eng.pdn.ac.lk.com)
+- E/20/328, Name, [email](mailto:e20328@eng.pdn.ac.lk.com)
+- E/20/377, Name, [email](mailto:e20377@eng.pdn.ac.lk.com)
 
 #### Supervisors
 
-- Name, [email](mailto:name@eng.pdn.ac.lk)
-- Name, [email](mailto:name@eng.pdn.ac.lk)
+- Prof. Kamalanath Samarakoon, [email](mailto:kamalanath@eng.pdn.ac.lk)
 
 #### Table of content
 
@@ -35,12 +34,11 @@ title:
 
 ---
 
-<!-- 
+<!--
 DELETE THIS SAMPLE before publishing to GitHub Pages !!!
 This is a sample image, to show how to add images to your page. To learn more options, please refer [this](https://projects.ce.pdn.ac.lk/docs/faq/how-to-add-an-image/)
-![Sample Image](./images/sample.png) 
+![Sample Image](./images/sample.png)
 -->
-
 
 ## Abstract
 
@@ -55,6 +53,7 @@ This is a sample image, to show how to add images to your page. To learn more op
 ## Conclusion
 
 ## Publications
+
 [//]: # "Note: Uncomment each once you uploaded the files to the repository"
 
 <!-- 1. [Semester 7 report](./) -->
@@ -63,10 +62,9 @@ This is a sample image, to show how to add images to your page. To learn more op
 <!-- 4. [Semester 8 slides](./) -->
 <!-- 5. Author 1, Author 2 and Author 3 "Research paper title" (2021). [PDF](./). -->
 
-
 ## Links
 
-[//]: # ( NOTE: EDIT THIS LINKS WITH YOUR REPO DETAILS )
+[//]: # " NOTE: EDIT THIS LINKS WITH YOUR REPO DETAILS "
 
 - [Project Repository](https://github.com/cepdnaclk/repository-name)
 - [Project Page](https://cepdnaclk.github.io/repository-name)
