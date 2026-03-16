@@ -17,11 +17,11 @@ from snn_inference import SNNInferenceEngine, SensorReading
 def run_benchmark(model_path: str, scaler_path: str,
                   csv_path: str, sensor_id: int = 1) -> None:
 
-    print("\n" + "═"*60)
+    print("\n" + "="*60)
     print("  INFERENCE BENCHMARK")
     print(f"  Model  : {model_path}")
     print(f"  Sensor : {sensor_id} (front)")
-    print("═"*60 + "\n")
+    print("="*60 + "\n")
 
     engine = SNNInferenceEngine(model_path, scaler_path,
                                 target_sensor_id=sensor_id)
@@ -78,7 +78,7 @@ def run_benchmark(model_path: str, scaler_path: str,
     y_pred   = np.array(y_pred)
     fw_agree = np.array(fw_agree)
 
-    print(f"\n  ── Throughput ──────────────────────────")
+    print(f"\n ---------- Throughput ----------")
     print(f"  Rows total        : {len(df)}")
     print(f"  Buffer warm-up    : {n_skipped} skipped")
     print(f"  Inferences        : {len(y_true)}")
@@ -86,13 +86,13 @@ def run_benchmark(model_path: str, scaler_path: str,
     print(f"  Throughput        : {len(y_true)/elapsed:.1f} inf/s")
 
     s = engine.stats()
-    print(f"\n  ── Latency (ms) ────────────────────────")
+    print(f"\n  -- Latency (ms) ---------------------------")
     lats = list(engine._latencies)
     for p in [50, 75, 90, 95, 99]:
         print(f"  p{p:>2}  : {np.percentile(lats, p):.3f} ms")
     print(f"  max  : {s['max_lat_ms']:.3f} ms")
 
-    print(f"\n  ── Accuracy vs ground truth ────────────")
+    print(f"\n  -- Accuracy vs ground truth ---------------------")
     print(classification_report(y_true, y_pred,
                                 target_names=["Safe", "Danger"], digits=4))
 
@@ -102,11 +102,11 @@ def run_benchmark(model_path: str, scaler_path: str,
     print(f"  True Safe   :  {cm[0,0]:>9d}   {cm[0,1]:>11d}")
     print(f"  True Danger :  {cm[1,0]:>9d}   {cm[1,1]:>11d}")
 
-    print(f"\n  ── SNN vs Firmware heuristic ───────────")
+    print(f"\n  -- SNN vs Firmware heuristic --------------")
     print(f"  Agreement rate : {fw_agree.mean()*100:.2f}%")
     print(f"  (% of frames where SNN and firmware agree on Safe/Danger)")
 
-    print(f"\n  ✓ Benchmark complete\n")
+    print(f"\n Benchmark complete\n")
 
 
 if __name__ == "__main__":
