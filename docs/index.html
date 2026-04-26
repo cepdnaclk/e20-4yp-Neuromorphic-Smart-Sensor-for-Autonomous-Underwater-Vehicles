@@ -1,1 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuromorphic Smart Sensor for Autonomous Underwater Vehicles</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep:     #020c06;
+    --forest:   #041a0a;
+    --pine:     #0a3d1a;
+    --green:    #0f6e2e;
+    --lime:     #22c55e;
+    --electric: #4ade80;
+    --neon:     #86efac;
+    --dim:      #6b9e7a;
+    --muted:    #2d5c3a;
+    --text:     #bbf7d0;
+    --white:    #f0fdf4;
+    --danger:   #f87171;
+    --warn:     #fbbf24;
+    --card:     rgba(4,26,10,0.75);
+    --border:   rgba(34,197,94,0.18);
+  }
 
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  
+  body {
+    background: var(--deep);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* --- SONAR BACKGROUND SYSTEM --- */
+
+  /* GRID & DISTANCE RINGS */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: 
+      radial-gradient(circle at center, transparent 0%, var(--deep) 85%),
+      repeating-radial-gradient(circle at center, var(--border) 0, var(--border) 1px, transparent 1px, transparent 100px),
+      repeating-linear-gradient(0deg, transparent, transparent 79px, rgba(34,197,94,0.03) 79px, rgba(34,197,94,0.03) 80px),
+      repeating-linear-gradient(90deg, transparent, transparent 79px, rgba(34,197,94,0.03) 79px, rgba(34,197,94,0.03) 80px);
+    opacity: 0.6;
+  }
+
+  /* ROTATING SCAN BEAM */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 200vmax;
+    height: 200vmax;
+    transform: translate(-50%, -50%);
+    background: conic-gradient(
+      from 0deg,
+      var(--lime) 0deg,
+      rgba(34, 197, 94, 0.3) 2deg,
+      rgba(34, 197, 94, 0.1) 12deg,
+      transparent 50deg
+    );
+    border-radius: 50%;
+    z-index: 0;
+    animation: sweep-rotate 9s linear infinite;
+    filter: blur(1px);
+    pointer-events: none;
+  }
+
+  /* EXPANDING PING WAVE */
+  .sonar-pulse {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 1px;
+    height: 1px;
+    background: transparent;
+    border: 2px solid var(--lime);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    pointer-events: none;
+    animation: ping-wave 9s ease-out infinite;
+  }
+
+  /* RED TARGET BLIPS */
+  .sonar-target {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background: var(--danger);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    pointer-events: none;
+    box-shadow: 0 0 15px 3px var(--danger);
+    animation: target-fade 9s ease-out forwards;
+  }
+
+  /* CRT SCANLINE OVERLAY */
+  .crt-overlay {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), 
+                linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+    background-size: 100% 3px, 3px 100%;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @keyframes sweep-rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  @keyframes ping-wave {
+    0% { width: 0; height: 0; opacity: 1; border-width: 4px; }
+    50% { opacity: 0.4; }
+    100% { width: 180vmax; height: 180vmax; opacity: 0; border-width: 1px; }
+  }
+
+  @keyframes target-fade {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    10% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; filter: blur(3px); }
+  }
+
+  /* --- ORIGINAL CONTENT STYLING --- */
+
+  body > * { position:relative; z-index:10; }
+
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    padding:0 3rem; height:60px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:rgba(2,12,6,0.88); backdrop-filter:blur(16px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav-logo { font-family:'Space Mono',monospace; font-size:0.8rem; color:var(--lime); letter-spacing:0.08em; text-transform:uppercase; }
+  .nav-links { display:flex; gap:2rem; list-style:none; }
+  .nav-links a { font-family:'Space Mono',monospace; font-size:0.9rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--dim); text-decoration:none; transition:color 0.2s; }
+  .nav-links a:hover { color:var(--lime); }
+
+  .hero { min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:8rem 3rem 4rem; max-width:1200px; margin:0 auto; }
+  .hero-tag { font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--lime); margin-bottom:1.5rem; display:flex; align-items:center; gap:0.8rem; }
+  .hero-tag::before { content:''; display:inline-block; width:32px; height:1px; background:var(--lime); }
+  .hero h1 { font-family:'Syne',sans-serif; font-size:clamp(2.4rem,5vw,4.2rem); font-weight:800; line-height:1.1; color:var(--white); max-width:820px; margin-bottom:1.5rem; }
+  .hero h1 span { color:var(--lime); }
+  .hero-sub { font-size:1.15rem; color:var(--dim); max-width:700px; line-height:1.7; margin-bottom:3rem; }
+  .hero-badges { display:flex; flex-wrap:wrap; gap:0.75rem; margin-bottom:3rem; }
+  .badge { font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; padding:0.4rem 1rem; border:1px solid var(--border); border-radius:2px; color:var(--dim); background:rgba(34,197,94,0.04); }
+  .badge.highlight { border-color:var(--lime); color:var(--lime); background:rgba(34,197,94,0.08); }
+  .hero-metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; max-width:800px; }
+  .metric { border-left:2px solid var(--green); padding-left:1.2rem; animation:fadeUp 0.6s ease both; }
+  .metric:nth-child(1){animation-delay:0.1s} .metric:nth-child(2){animation-delay:0.2s} .metric:nth-child(3){animation-delay:0.3s} .metric:nth-child(4){animation-delay:0.4s}
+  .metric-value { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; color:var(--electric); line-height:1; }
+  .metric-label { font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--dim); margin-top:0.3rem; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  section { max-width:1200px; margin:0 auto; padding:5rem 3rem; }
+  .section-label { font-family:'Space Mono',monospace; font-size:0.8rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--green); margin-bottom:0.8rem; display:flex; align-items:center; gap:0.6rem; }
+  .section-label::before { content:'//'; color:var(--muted); }
+  h2 { font-family:'Syne',sans-serif; font-size:clamp(1.6rem,3vw,2.4rem); font-weight:700; color:var(--white); margin-bottom:1rem; }
+  .divider { height:1px; background:linear-gradient(90deg,var(--green) 0%,var(--border) 60%,transparent 100%); margin-bottom:3rem; }
+  p { line-height:1.8; color:var(--dim); }
+
+  .team-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2rem; }
+  .team-card { background:var(--card); border:1px solid var(--border); padding:2rem; position:relative; overflow:hidden; transition:border-color 0.3s,transform 0.3s; backdrop-filter: blur(4px); }
+  .team-card::before { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--green),var(--lime)); opacity:0; transition:opacity 0.3s; }
+  .team-card:hover { border-color:var(--lime); transform:translateY(-3px); }
+  .team-card:hover::before { opacity:1; }
+  .team-id { font-family:'Space Mono',monospace; font-size:0.8rem; color:var(--lime); letter-spacing:0.12em; margin-bottom:0.5rem; }
+  .team-name { font-family:'Syne',sans-serif; font-size:1.05rem; font-weight:700; color:var(--white); margin-bottom:0.8rem; }
+  .team-role { font-size:0.8rem; color:var(--dim); line-height:1.5; margin-bottom:1rem; }
+  .team-email { display:inline-flex; align-items:center; gap:0.4rem; font-family:'Space Mono',monospace; font-size:0.8rem; color:var(--green); text-decoration:none; transition:color 0.2s; }
+  .team-email:hover { color:var(--lime); }
+  .supervisor-block { margin-top:2rem; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--lime); padding:1.5rem 2rem; display:flex; align-items:center; gap:2rem; backdrop-filter: blur(4px); }
+  .supervisor-tag { font-family:'Space Mono',monospace; font-size:0.9rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--lime); white-space:nowrap; }
+  .supervisor-name { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:700; color:var(--white); }
+  .supervisor-dept { font-size:0.82rem; color:var(--dim); }
+  .member-img {
+  width: 120px;          /* Adjust size as needed */
+  height: 120px;
+  border-radius: 50%;    /* Makes the image a circle */
+  object-fit: cover;     /* Prevents stretching */
+  margin: 0 auto 15px;   /* Centers the image and adds space below */
+  display: block;
+  border: 3px solid #eee; /* Optional: adds a nice border */
+}
+  .abstract-box { background:var(--card); border:1px solid var(--border); padding:2.5rem 3rem; position:relative; backdrop-filter: blur(4px); }
+  .abstract-box::before { content:'"'; position:absolute; top:-0.5rem;left:1.5rem; font-size:6rem; font-family:'Syne',sans-serif; font-weight:800; color:var(--green); opacity:0.3; line-height:1; }
+  .abstract-text { font-size:0.95rem; line-height:1.9; color:var(--text); position:relative; }
+  .abstract-keywords { margin-top:1.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; }
+  .kw-label { font-family:'Space Mono',monospace; font-size:0.6rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--muted); }
+  .kw { font-family:'Space Mono',monospace; font-size:0.7rem; padding:0.25rem 0.7rem; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.15); color:var(--lime); border-radius:2px; }
+
+  .rw-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-top:2rem; }
+  .rw-card { background:var(--card); border:1px solid var(--border); padding:1.8rem; transition:border-color 0.3s; backdrop-filter: blur(4px); }
+  .rw-card:hover { border-color:rgba(34,197,94,0.4); }
+  .rw-num { font-family:'Space Mono',monospace; font-size:2rem; font-weight:700; color:var(--muted); opacity:0.4; line-height:1; margin-bottom:0.5rem; }
+  .rw-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:0.6rem; }
+  .rw-desc { font-size:0.85rem; color:var(--dim); line-height:1.65; }
+
+  .method-pipeline { display:flex; align-items:stretch; gap:0; margin:2.5rem 0; overflow-x:auto; }
+  .pipe-step { flex:1; min-width:150px; background:var(--card); border:1px solid var(--border); padding:1.5rem 1.2rem; position:relative; text-align:center; }
+  .pipe-step + .pipe-step { border-left:none; }
+  .pipe-step::after { content:'→'; position:absolute; right:-0.9rem; top:50%; transform:translateY(-50%); color:var(--lime); font-size:1.1rem; z-index:2; background:var(--deep); padding:0 0.1rem; }
+  .pipe-step:last-child::after { display:none; }
+  .pipe-icon { font-size:1.6rem; margin-bottom:0.6rem; }
+  .pipe-label { font-family:'Syne',sans-serif; font-size:0.8rem; font-weight:700; color:var(--white); margin-bottom:0.4rem; }
+  .pipe-sub { font-family:'Space Mono',monospace; font-size:0.58rem; color:var(--dim); line-height:1.5; }
+
+  .method-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2rem; }
+  .method-card { background:var(--card); border:1px solid var(--border); padding:2rem; backdrop-filter: blur(4px); }
+  .method-icon { width:40px;height:40px; border-radius:4px; background:rgba(34,197,94,0.1); border:1px solid var(--green); display:flex; align-items:center; justify-content:center; font-size:1.2rem; margin-bottom:1rem; }
+  .method-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:0.6rem; }
+  .method-desc { font-size:0.82rem; color:var(--dim); line-height:1.65; }
+
+  .exp-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; margin-top:2rem; }
+  .exp-card { background:var(--card); border:1px solid var(--border); padding:2rem; backdrop-filter: blur(4px); }
+  .exp-title { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:1rem; display:flex; align-items:center; gap:0.6rem; }
+  .exp-title::before { content:''; display:inline-block; width:8px;height:8px; background:var(--lime); border-radius:50%; }
+  .exp-list { list-style:none; display:flex; flex-direction:column; gap:0.6rem; }
+  .exp-list li { font-size:0.85rem; color:var(--dim); display:flex; gap:0.7rem; align-items:flex-start; line-height:1.5; }
+  .exp-list li::before { content:'—'; color:var(--green); flex-shrink:0; margin-top:0.05rem; }
+  .dataset-table { width:100%; border-collapse:collapse; margin-top:1.5rem; }
+  .dataset-table th { font-family:'Space Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--lime); border-bottom:1px solid var(--border); padding:0.6rem 1rem; text-align:left; }
+  .dataset-table td { font-size:0.85rem; color:var(--dim); padding:0.55rem 1rem; border-bottom:1px solid rgba(34,197,94,0.06); }
+  .dataset-table td:last-child { color:var(--text); font-family:'Space Mono',monospace; font-size:0.78rem; }
+
+  .results-table-wrap { overflow-x:auto; margin-top:2rem; }
+  .results-table { width:100%; border-collapse:collapse; }
+  .results-table th { font-family:'Space Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--lime); padding:0.8rem 1rem; border-bottom:1px solid var(--border); text-align:left; white-space:nowrap; }
+  .results-table td { font-size:0.82rem; padding:0.7rem 1rem; border-bottom:1px solid rgba(34,197,94,0.06); color:var(--dim); font-family:'Space Mono',monospace; }
+  .results-table tr.highlight-row td { color:var(--electric); background:rgba(74,222,128,0.04); }
+  .results-table td.best { color:var(--electric); font-weight:700; }
+
+  .findings-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.5rem; margin-top:2rem; }
+  .finding-card { background:var(--card); border:1px solid var(--border); padding:1.8rem; position:relative; overflow:hidden; backdrop-filter: blur(4px); }
+  .finding-card::after { content:''; position:absolute; bottom:0;left:0;right:0; height:2px; background:linear-gradient(90deg,var(--green),transparent); }
+  .finding-num { font-family:'Syne',sans-serif; font-size:2.5rem; font-weight:800; color:var(--lime); opacity:0.5; line-height:1; margin-bottom:0.5rem; }
+  .finding-stat { font-family:'Syne',sans-serif; font-size:1.5rem; font-weight:800; color:var(--electric); line-height:1; margin-bottom:0.4rem; }
+  .finding-desc { font-size:0.82rem; color:var(--dim); line-height:1.6; }
+
+  .conclusion-box { background:var(--card); border:1px solid var(--border); padding:2.5rem; margin-top:2rem; backdrop-filter: blur(4px); }
+  .conclusion-text { font-size:0.95rem; color:var(--text); line-height:1.9; margin-bottom:2rem; }
+  .future-work-list { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  .fw-item { display:flex; gap:0.8rem; align-items:flex-start; padding:1rem; background:rgba(34,197,94,0.03); border:1px solid rgba(34,197,94,0.1); }
+  .fw-dot { width:8px;height:8px; background:var(--green); border-radius:50%; flex-shrink:0; margin-top:0.3rem; }
+  .fw-text { font-size:0.82rem; color:var(--dim); line-height:1.55; }
+
+  .links-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; margin-top:2rem; }
+  .link-card { background:var(--card); border:1px solid var(--border); padding:1.5rem 2rem; display:flex; align-items:center; gap:1.2rem; text-decoration:none; transition:border-color 0.3s,transform 0.2s; backdrop-filter: blur(4px); }
+  .link-card:hover { border-color:var(--lime); transform:translateX(4px); }
+  .link-icon { font-size:1.5rem; flex-shrink:0; }
+  .link-title { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; color:var(--white); margin-bottom:0.2rem; }
+  .link-url { font-family:'Space Mono',monospace; font-size:0.6rem; color:var(--green); }
+
+  .contrib-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; margin-top:2rem; }
+  .contrib-card { background:var(--card); border:1px solid var(--border); padding:1.8rem; backdrop-filter: blur(4px); }
+  .contrib-name { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--white); margin-bottom:0.3rem; }
+  .contrib-id { font-family:'Space Mono',monospace; font-size:0.62rem; color:var(--lime); margin-bottom:0.8rem; }
+  .contrib-text { font-size:0.82rem; color:var(--dim); line-height:1.65; }
+
+  footer { border-top:1px solid var(--border); padding:2.5rem 3rem; display:flex; justify-content:space-between; align-items:center; max-width:1200px; margin:0 auto; }
+  .footer-left { font-family:'Space Mono',monospace; font-weight:700; font-size:0.7rem; color:var(--muted); line-height:1.7; }
+  .footer-right { font-family:'Space Mono',monospace; font-weight:700; font-size:0.7rem; color:var(--muted); text-align:right; }
+
+  .mt-1{margin-top:0.5rem} .mt-2{margin-top:1rem} .mt-3{margin-top:1.5rem}
+  .highlight-text { color:var(--lime); }
+  .mono { font-family:'Space Mono',monospace; }
+
+  .reveal { opacity:0; transform:translateY(20px); transition:opacity 0.6s ease,transform 0.6s ease; }
+  .reveal.visible { opacity:1; transform:translateY(0); }
+
+  @media(max-width:768px){
+    nav{padding:0 1.5rem} .nav-links{display:none}
+    .hero{padding:7rem 1.5rem 3rem} section{padding:3rem 1.5rem}
+    .hero-metrics{grid-template-columns:repeat(2,1fr)}
+    .team-grid,.rw-grid,.exp-grid,.method-grid,.findings-grid,.contrib-grid,.links-grid,.future-work-list{grid-template-columns:1fr}
+    .method-pipeline{flex-direction:column} .pipe-step::after{display:none}
+    footer{flex-direction:column;gap:1rem;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<div class="sonar-pulse"></div>
+<div class="crt-overlay"></div>
+
+<nav>
+  <div class="nav-logo">E/20 · FYP · AUV · 2025-2026</div>
+  <ul class="nav-links">
+    <li><a href="#abstract">Abstract</a></li>
+    <li><a href="#related">Related Work</a></li>
+    <li><a href="#methodology">Methodology</a></li>
+    <li><a href="#experiment">Experiment</a></li>
+    <li><a href="#results">Results</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+    <li><a href="#links">Links</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Final Year Project · Department of Computer Engineering · University of Peradeniya</div>
+  <h1>Neuromorphic <span>Smart Sensor</span> for Autonomous Underwater Vehicles</h1>
+  <p class="hero-sub">A neuromorphic-inspired perception system combining a software-based Spiking Neural Network for obstacle detection with a tether based geometric model for 3D positioning, delivering competitive accuracy at a fraction of the computational cost.</p>
+  <div class="hero-badges">
+    <span class="badge highlight">Spiking Neural Networks</span>
+    <span class="badge highlight">Neuromorphic Computing</span>
+    <span class="badge">Event-based Sensing</span>
+    <span class="badge">Autonomous Underwater Vehicles</span>
+    <span class="badge">Underwater Navigation</span>
+  </div>
+  <div class="hero-metrics">
+    <div class="metric"><div class="metric-value">92.71%</div><div class="metric-label">Detection Accuracy</div></div>
+    <div class="metric"><div class="metric-value">98%</div><div class="metric-label">FLOP Reduction vs LSTM</div></div>
+    <div class="metric"><div class="metric-value">99%</div><div class="metric-label">Energy Reduction</div></div>
+    <div class="metric"><div class="metric-value">92.3%</div><div class="metric-label">Input Sparsity</div></div>
+  </div>
+</div>
+
+<section id="team">
+  <div class="section-label">Team</div>
+  <h2>Researchers & Supervisors</h2>
+  <div class="divider"></div>
+  <div class="team-grid reveal">
+    <div class="team-card">
+        <img src="images/036.png" alt="K.G.R.I. Bandara" class="member-img">
+      <div class="team-id">E/20/036</div>
+      <div class="team-name">K.G.R.I. Bandara</div>
+      <div class="team-role">Designed and implemented the machine learning pipeline, EventDrivenSNN architecture, Send-on-Delta encoder, feature engineering, six-model comparative evaluation, and real-time inference engine.</div>
+      <a href="mailto:e20036@eng.pdn.ac.lk" class="team-email">✉ e20036@eng.pdn.ac.lk</a>
+    </div>
+    <div class="team-card">
+        <img src="images/328.png" alt="R.V.C. Rathnaweera" class="member-img">
+      <div class="team-id">E/20/328</div>
+      <div class="team-name">R.V.C. Rathnaweera</div>
+      <div class="team-role">Designed and fabricated the hardware prototype, including the custom PCB, sensor wiring, ESP32 firmware, and pool trial setup.</div>
+      <a href="mailto:e20328@eng.pdn.ac.lk" class="team-email">✉ e20328@eng.pdn.ac.lk</a>
+    </div>
+    <div class="team-card">
+        <img src="images/377.png" alt="V.P.H. Sidantha" class="member-img">
+      <div class="team-id">E/20/377</div>
+      <div class="team-name">V.P.H. Sidantha</div>
+      <div class="team-role">Designed and implemented the tether-based geometric positioning model, mathematical unit tests, and simulation validation.</div>
+      <a href="mailto:e20377@eng.pdn.ac.lk" class="team-email">✉ e20377@eng.pdn.ac.lk</a>
+    </div>
+  </div>
+  <div class="supervisor-block reveal">
+    <div class="supervisor-tag">Academic Supervisor</div>
+    <div>
+        <img src="images/KS.png" alt="Prof. S.M.K.B. Samarakoon" class="member-img">
+    </div>
+    
+    <div>
+        
+      <div class="supervisor-name">Prof. S.M.K.B. Samarakoon</div>
+      <div class="supervisor-dept">Department of Computer Engineering · University of Peradeniya</div>
+    </div>
+    <a href="mailto:kamalanath@eng.pdn.ac.lk" class="team-email" style="margin-left:auto;">✉ kamalanath@eng.pdn.ac.lk</a>
+  </div>
+</section>
+
+<section id="abstract">
+  <div class="section-label">01 · Abstract</div>
+  <h2>Overview</h2>
+  <div class="divider"></div>
+  <div class="abstract-box reveal">
+    <p class="abstract-text">
+      Autonomous Underwater Vehicles (AUVs) face a fundamental tension between perception accuracy and energy consumption. Conventional sensing architectures rely on continuously-active neural networks whose power demands severely limit mission duration. This paper presents a neuromorphic-inspired system combining a software-based Spiking Neural Network (SNN) for obstacle detection with a tether-based geometric model for 3D positioning.<br><br>
+      The obstacle detection subsystem uses Leaky Integrate-and-Fire neurons trained on ultrasonic readings from a JSN-SR04T sensor. A Send-on-Delta encoder converts continuous distance measurements into sparse spike trains (92.3% sparsity), enabling <strong class="highlight-text">92.71% detection accuracy</strong> at only 6,220 floating-point operations per inference. This represents a <strong class="highlight-text">98% reduction</strong> versus an equivalent LSTM (387,968 FLOPs) and a <strong class="highlight-text">99% reduction</strong> in analytical energy (2,448.3 nJ vs. 30.21 nJ). The positioning subsystem derives location from tether cable geometry using IMU and pressure sensor data, offering a practical alternative to DVL systems costing USD 15,000–50,000.
+    </p>
+    <div class="abstract-keywords">
+      <span class="kw-label">Keywords —</span>
+      <span class="kw">Autonomous Underwater Vehicles</span>
+      <span class="kw">Neuromorphic Computing</span>
+      <span class="kw">Spiking Neural Networks</span>
+      <span class="kw">Event-based Sensing</span>
+      <span class="kw">Underwater Navigation</span>
+    </div>
+  </div>
+</section>
+
+<section id="related">
+  <div class="section-label">02 · Related Work</div>
+  <h2>Background & Prior Art</h2>
+  <div class="divider"></div>
+  <div class="rw-grid">
+    <div class="rw-card reveal">
+      <div class="rw-num">A</div>
+      <div class="rw-title">Neuromorphic Sensing & SNNs</div>
+      <div class="rw-desc">Dynamic Vision Sensors realise event-driven neuromorphic principles at the hardware level, achieving microsecond latency and dramatic data reduction. Merolla et al. demonstrated spike-based neuromorphic chips performing inference at energy costs as low as 0.1 pJ per synaptic event, compared to 4.6 pJ on conventional CMOS silicon. Eshraghian et al. provided the foundational framework for training SNNs on conventional hardware using surrogate gradient methods.</div>
+    </div>
+    <div class="rw-card reveal">
+      <div class="rw-num">B</div>
+      <div class="rw-title">AUV Obstacle Detection</div>
+      <div class="rw-desc">Conventional AUV obstacle detection relies on acoustic sonar or camera-based systems facing fundamental limitations in shallow, cluttered, or low-visibility environments. LSTM-based dead-reckoning explored by Topini et al. demonstrates strong temporal modelling at significant computational cost. This work frames obstacle detection as a temporal binary classification task over sliding windows, showing an SNN achieves competitive accuracy at a fraction of recurrent baseline costs.</div>
+    </div>
+    <div class="rw-card reveal">
+      <div class="rw-num">C</div>
+      <div class="rw-title">Underwater Positioning</div>
+      <div class="rw-desc">GPS signals are attenuated within centimetres of the water surface, forcing AUVs to rely on Ultra-Short Baseline acoustic systems or costly DVL sensors (USD 15,000–50,000). Viel et al. proposed estimating ROV position by observing tethered umbilical cable geometry with sliding ballasts, achieving approximately 25 cm position errors with real IMU measurements.</div>
+    </div>
+    <div class="rw-card reveal">
+      <div class="rw-num">D</div>
+      <div class="rw-title">Research Gap Addressed</div>
+      <div class="rw-desc">No prior work has simultaneously (i) applied software-based SNN inference to real ultrasonic AUV sensor data, (ii) validated the energy advantage of SNN sparsity against multiple dense baselines under identical experimental conditions, or (iii) integrated event-driven obstacle detection with tether-based geometric positioning into a single embedded prototype. This paper addresses all three gaps.</div>
+    </div>
+  </div>
+</section>
+
+<section id="methodology">
+  <div class="section-label">03 · Methodology</div>
+  <h2>System Architecture & Methods</h2>
+  <div class="divider"></div>
+  <div class="section-label mt-2">Processing Pipeline</div>
+  <div class="method-pipeline reveal">
+    <div class="pipe-step"><div class="pipe-icon">📡</div><div class="pipe-label">Sensor Acquisition</div><div class="pipe-sub">JSN-SR04T · ESP32 · 200ms · EMA filter</div></div>
+    <div class="pipe-step"><div class="pipe-icon">⚡</div><div class="pipe-label">Send-on-Delta</div><div class="pipe-sub">Continuous → sparse spikes · θ=0.5 · 92.3% sparsity</div></div>
+    <div class="pipe-step"><div class="pipe-icon">🧠</div><div class="pipe-label">EventDrivenSNN</div><div class="pipe-sub">LIF neurons · 3 FC layers · W=15 windows</div></div>
+    <div class="pipe-step"><div class="pipe-icon">🧭</div><div class="pipe-label">Classification</div><div class="pipe-sub">Safe / Danger · 3.5 Hz nav commands</div></div>
+    <div class="pipe-step"><div class="pipe-icon">📍</div><div class="pipe-label">3D Positioning</div><div class="pipe-sub">Tether geometry · IMU · CORS/RTK GPS</div></div>
+  </div>
+  <div class="method-grid">
+    <div class="method-card reveal"><div class="method-icon">🔊</div><div class="method-title">Sensor Acquisition Firmware</div><div class="method-desc">ESP32 drives four JSN-SR04T waterproof ultrasonic sensors using sequential triggering to prevent acoustic cross-talk. Each sensor fires seven pings at 25 ms intervals; median echo duration converted to distance at 0.148 cm/µs. Drop-rejection filter and EMA smoothing (α=0.25) applied. Adaptive per-sensor baseline learned from 25 stability-gated samples within a 12 cm band.</div></div>
+    <div class="method-card reveal"><div class="method-icon">⚡</div><div class="method-title">Send-on-Delta Encoding</div><div class="method-desc">Core neuromorphic contribution: converts feature windows into binary spike trains. A positive (ON) spike emitted when a feature value change exceeds threshold θ; a negative (OFF) spike when it falls below −θ. With θ=0.5 and five input features, channel dimension doubles from 5 to 10, yielding 91.5% silent inputs on real AUV data.</div></div>
+    <div class="method-card reveal"><div class="method-icon">🧠</div><div class="method-title">EventDrivenSNN Architecture</div><div class="method-desc">Three fully-connected layers interleaved with Leaky Integrate-and-Fire neurons: <span class="mono" style="font-size:0.75rem;color:var(--lime);">10 → FC(10→32) → LIF₁ → FC(32→32) → LIF₂ → FC(32→2) → LIF₃</span>. β=0.9 decay, U_thr=1. Only 1,474 trainable parameters — 9× fewer than equivalent two-layer LSTM. Trained with fast sigmoid surrogate gradient.</div></div>
+    <div class="method-card reveal"><div class="method-icon">📍</div><div class="method-title">Tether-Based Positioning</div><div class="method-desc">Implements Viel et al. model: tether assumed straight two-segment geometry maintained by sliding ballast. Given total cable length L, AUV depth z from pressure sensor, and four tether angles from two IMUs, segment lengths and AUV Cartesian offset computed analytically. CORS/RTK GPS converts local offset to WGS84 absolute coordinates.</div></div>
+    <div class="method-card reveal"><div class="method-icon">📊</div><div class="method-title">Feature Engineering</div><div class="method-desc">Five temporal features: (1) time_gap — sensor timing regularity; (2) dist_f_cm — EMA-filtered distance; (3) delta — deviation from adaptive baseline; (4) velocity — Δd_f/Δt, approach rate; (5) acceleration — Δv/Δt. Sliding windows W=15 with stride S=5. Labels assigned at prediction horizon H=0.</div></div>
+    <div class="method-card reveal"><div class="method-icon">⚖️</div><div class="method-title">Training Configuration</div><div class="method-desc">Session-level 70/15/15 train/validation/test split. Class-balanced cross-entropy loss (weights: 0.61 safe, 2.79 danger). Adam optimiser, η=10⁻³, 20 epochs, batch size 64. Compared against RF, LSTM, GRU, 1D-CNN, and MLP baselines under identical splits, scalers, and class weights.</div></div>
+  </div>
+  <div class="reveal" style="text-align: center; margin: 2rem 0; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 1rem; border: 1px solid var(--border);">
+  <img src="images/snndigrem.png" alt="SNN Architecture Pipeline" style="max-width: 100%; height: auto;">
+  <div class="pipe-sub" style="margin-top: 10px; font-size: 0.8rem;">Fig: End-to-end Machine Learning Pipeline from Sensor to Spike-based Decision</div>
+  </div>
+  <div class="reveal" style="text-align: center; margin: 2rem 0; background: rgba(255,255,255,0.03); border-radius: 8px; padding: 1rem; border: 1px solid var(--border);">
+  <img src="images/Blue and White Modern Business Pitch Deck Presentation.png" 
+       alt="GeoModel Architecture" 
+       style="max-width: 100%; height: auto; border-radius: 4px; filter: brightness(0.9);">
+  
+  <div class="pipe-sub" style="margin-top: 10px;">
+    Fig 2: Tether-based Geometric Model for 3D Positioning using IMU and Pressure Data
+  </div>
+
+</section>
+
+<section id="experiment">
+  <div class="section-label">04 · Experiment</div>
+  <h2>Setup & Implementation</h2>
+  <div class="divider"></div>
+  <div class="exp-grid">
+    <div class="exp-card reveal">
+      <div class="exp-title">Hardware Prototype</div>
+      <ul class="exp-list">
+        <li>PVC pipe frame with four JSN-SR04T waterproof ultrasonic sensors (front, downward, right, left)</li>
+        <li>ESP32 microcontroller on custom-designed fabricated PCB</li>
+        <li>Six thrusters for full manoeuvring capability</li>
+        <li>USB tether to surface station (simultaneous UART data + navigation commands)</li>
+        <li>Syringe-based variable ballast mechanism (designed and prototyped)</li>
+        <li>NVIDIA Jetson Nano for AI inference on embedded GPU</li>
+        <li>CORS/RTK GPS receiver on surface buoy for centimetre-accurate positioning</li>
+      </ul>
+    </div>
+    <div class="exp-card reveal">
+      <div class="exp-title">Dataset Summary</div>
+      <table class="dataset-table">
+        <tr><th>Property</th><th>Value</th></tr>
+        <tr><td>Total raw records</td><td>26,273</td></tr>
+        <tr><td>Records after filtering</td><td>22,270</td></tr>
+        <tr><td>Sessions</td><td>87</td></tr>
+        <tr><td>Safe windows</td><td>3,423</td></tr>
+        <tr><td>Danger windows</td><td>768</td></tr>
+        <tr><td>Window size W</td><td>15 timesteps</td></tr>
+        <tr><td>Stride S</td><td>5 timesteps</td></tr>
+        <tr><td>Total windows</td><td>4,191</td></tr>
+        <tr><td>Class ratio</td><td>≈ 4.46 : 1</td></tr>
+      </table>
+    </div>
+    <div class="exp-card reveal">
+      <div class="exp-title">Pool Trial Setup</div>
+      <ul class="exp-list">
+        <li>Conducted in a real pool with Sensor 1 (front-facing) active</li>
+        <li>Obstacle: flat pool wall surface</li>
+        <li>Approximately ten test runs at low speed via manual thruster control</li>
+        <li>Detection confirmed via serial monitor DANGER events and Streamlit dashboard</li>
+        <li>Navigation sequence: FORWARD → CAUTION → STOP observed consistently</li>
+        <li>Validates end-to-end perception pipeline under real underwater conditions</li>
+      </ul>
+    </div>
+    <div class="exp-card reveal">
+      <div class="exp-title">Baseline Models Evaluated</div>
+      <ul class="exp-list">
+        <li><strong style="color:var(--text)">Random Forest</strong> — 100 estimators, depth 10, non-neural upper-bound</li>
+        <li><strong style="color:var(--text)">LSTM</strong> — Two-layer, hidden 32, dropout 0.2; primary recurrent baseline</li>
+        <li><strong style="color:var(--text)">GRU</strong> — Two-layer, hidden 32, dropout 0.2; lighter recurrent test</li>
+        <li><strong style="color:var(--text)">1D-CNN</strong> — Three causal dilated conv layers (32/64/64 channels)</li>
+        <li><strong style="color:var(--text)">MLP</strong> — Two hidden layers size 64 with batch norm</li>
+        <li><strong style="color:var(--lime)">SNN (Ours)</strong> — EventDrivenSNN with Send-on-Delta on snntorch</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="section-label">05 · Results</div>
+  <h2>Results & Analysis</h2>
+  <div class="divider"></div>
+  <div class="section-label">Six-Model Comparison · 741-window held-out test set</div>
+  <div class="results-table-wrap reveal">
+    <table class="results-table">
+      <thead><tr><th>Metric</th><th>RF</th><th>LSTM</th><th>GRU</th><th>1D-CNN</th><th>MLP</th><th>SNN (Ours)</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--text)">Accuracy</td><td class="best">99.46%</td><td>98.65%</td><td>99.33%</td><td>98.65%</td><td>98.25%</td><td>92.71%</td></tr>
+        <tr><td style="color:var(--text)">Danger Recall</td><td>0.9874</td><td class="best">1.0000</td><td class="best">1.0000</td><td>0.9937</td><td>0.9937</td><td>0.8679</td></tr>
+        <tr><td style="color:var(--text)">Danger F1</td><td class="best">0.9874</td><td>0.9695</td><td class="best">0.9845</td><td>0.9693</td><td>0.9605</td><td>0.8364</td></tr>
+        <tr><td style="color:var(--text)">Parameters</td><td>5,204</td><td>13,506</td><td>10,146</td><td>19,522</td><td>9,410</td><td class="best">1,474</td></tr>
+        <tr><td style="color:var(--text)">FLOPs / Inference</td><td>2,000</td><td>387,968</td><td>291,008</td><td>567,616</td><td>18,048</td><td class="best">6,220</td></tr>
+        <tr><td style="color:var(--text)">Active Memory (B)</td><td>21,116</td><td>4,148</td><td>2,228</td><td>4,148</td><td>820</td><td class="best">10</td></tr>
+        <tr class="highlight-row"><td style="color:var(--text)">Energy CPU (nJ)</td><td>3387.8</td><td>2448.3</td><td>1695.1</td><td>3274.7</td><td>214.2</td><td class="best">30.21</td></tr>
+        <tr><td style="color:var(--text)">Saving vs LSTM</td><td>−38%</td><td>—</td><td>+31%</td><td>−34%</td><td>+91%</td><td class="best">+99%</td></tr>
+        <tr><td style="color:var(--text)">Sparsity</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td class="best">92.3%</td></tr>
+        <tr><td style="color:var(--text)">Neuromorphic HW</td><td>No</td><td>No</td><td>No</td><td>No</td><td>No</td><td class="best">Yes</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="section-label mt-3">Key Findings</div>
+  <div class="findings-grid">
+    <div class="finding-card reveal"><div class="finding-num">01</div><div class="finding-stat">98% FLOP↓</div><div class="finding-desc">SNN requires only 6,220 FLOPs per inference vs 387,968 for LSTM — a 98% reduction achieved purely through event-driven sparsity, not specialised neuromorphic hardware.</div></div>
+    <div class="finding-card reveal"><div class="finding-num">02</div><div class="finding-stat">99% Energy↓</div><div class="finding-desc">Analytical energy drops from 2,448.3 nJ (LSTM) to 30.21 nJ (SNN CPU), with further reduction to 0.0074 nJ on Intel Loihi — a 22% mission duration increase on a 74 Wh battery.</div></div>
+    <div class="finding-card reveal"><div class="finding-num">03</div><div class="finding-stat">92.3% Sparse</div><div class="finding-desc">92.3% input sparsity arises naturally from AUV's slow underwater motion (≤14.1 cm per 200ms) falling below the Send-on-Delta threshold θ=0.5. Mean active spike rate: 7.7%.</div></div>
+    <div class="finding-card reveal"><div class="finding-num">04</div><div class="finding-stat">1D-CNN ≠ Efficient</div><div class="finding-desc">1D-CNN consumes 34% more energy than LSTM (3,274.7 vs 2,448.3 nJ). Architectural modernity does not guarantee efficiency — only event-driven sparsity achieves fundamental active-compute reductions.</div></div>
+    <div class="finding-card reveal"><div class="finding-num">05</div><div class="finding-stat">25 cm Position</div><div class="finding-desc">Tether-based geometric positioning passed all four mathematical unit tests, replacing DVL systems costing USD 15,000–50,000 with off-the-shelf sensors.</div></div>
+    <div class="finding-card reveal"><div class="finding-num">06</div><div class="finding-stat">Pool Validated</div><div class="finding-desc">End-to-end perception pipeline correctly detected a flat pool wall under real underwater conditions across ~10 test runs with consistent FORWARD → CAUTION → STOP sequencing.</div></div>
+  </div>
+</section>
+
+<section id="conclusion">
+  <div class="section-label">06 · Conclusion</div>
+  <h2>Conclusion & Future Work</h2>
+  <div class="divider"></div>
+  <div class="conclusion-box reveal">
+    <p class="conclusion-text">This paper presented a neuromorphic-inspired sensing and positioning system for low-cost AUVs, demonstrating that the computational advantages of event-driven processing are achievable on conventional embedded hardware without recourse to specialised neuromorphic chips. An EventDrivenSNN with Leaky Integrate-and-Fire neurons was trained on 26,273 real ultrasonic sensor readings collected across 87 experimental sessions. A Send-on-Delta encoder converts continuous distance measurements into sparse binary spike trains, yielding a measured input sparsity of 92.3% on real sensor data. The network achieves 92.71% obstacle detection accuracy at only 6,220 FLOPs per inference — a 98% reduction versus an equivalent LSTM and a 99% reduction in analytical energy (30.21 nJ versus 2,448.3 nJ).</p>
+    <div class="section-label">Future Work Directions</div>
+    <div class="future-work-list mt-2">
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">Closed-loop autonomy:</strong> Close the control loop between SNN inference output and thruster commands for fully autonomous obstacle avoidance without human intervention.</div></div>
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">Multi-sensor fusion:</strong> Extend SNN to fuse readings from all four JSN-SR04T sensors simultaneously, improving danger recall and false alarm suppression.</div></div>
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">Neuromorphic hardware deployment:</strong> Port EventDrivenSNN to Intel Loihi to empirically validate the theoretical 0.0074 nJ sub-nanojoule inference energy.</div></div>
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">IMU-integrated positioning:</strong> Integrate tether-geometry model with live IMU angle measurements and pressure-sensor depth readings, validated against a ground-truth reference system.</div></div>
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">Open-water generalisation:</strong> Collect data in open-water environments subject to varying temperature, salinity, turbulence, and acoustic conditions to test robustness of the SNN pipeline.</div></div>
+      <div class="fw-item"><div class="fw-dot"></div><div class="fw-text"><strong style="color:var(--text)">Variable-ballast integration:</strong> Integrate the syringe-based variable-ballast mechanism for depth control without manual weight adjustment, completing the fully autonomous underwater platform.</div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="section-label">Author Contributions</div>
+  <h2>Individual Contributions</h2>
+  <div class="divider"></div>
+  <div class="contrib-grid">
+    <div class="contrib-card reveal"><div class="contrib-name">K.G.R.I. Bandara</div><div class="contrib-id">E/20/036</div><div class="contrib-text">Conceived and implemented the machine learning pipeline, including the EventDrivenSNN architecture, Send-on-Delta encoder, feature engineering, six-model comparative evaluation, and real-time inference engine. Contributed equally to system integration, manuscript preparation, and presentation of results.</div></div>
+    <div class="contrib-card reveal"><div class="contrib-name">R.V.C. Rathnaweera</div><div class="contrib-id">E/20/328</div><div class="contrib-text">Designed and fabricated the hardware prototype, including the custom PCB, sensor wiring, ESP32 firmware, and pool trial setup. Contributed equally to system integration, manuscript preparation, and presentation of results.</div></div>
+    <div class="contrib-card reveal"><div class="contrib-name">V.P.H. Sidantha</div><div class="contrib-id">E/20/377</div><div class="contrib-text">Designed and implemented the tether-based geometric positioning model, mathematical unit tests, and simulation validation. Contributed equally to system integration, manuscript preparation, and presentation of results.</div></div>
+    <div class="contrib-card reveal"><div class="contrib-name">Prof. S.M.K.B. Samarakoon</div><div class="contrib-id">Academic Supervisor</div><div class="contrib-text">Provided academic supervision, research direction, and critical review of the manuscript throughout the project.</div></div>
+  </div>
+</section>
+
+<section id="links">
+  <div class="section-label">07 · Links</div>
+  <h2>Publications & Resources</h2>
+  <div class="divider"></div>
+  <div class="links-grid">
+    <a href="#" class="link-card reveal"><div class="link-icon">📄</div><div><div class="link-title">Research Paper</div><div class="link-url">Neuromorphic Smart Sensor for Autonomous Underwater Vehicles</div></div></a>
+    <a href="https://github.com/cepdnaclk/e20-4yp-Neuromorphic-Smart-Sensor-for-Autonomous-Underwater-Vehicles" class="link-card reveal" target="_blank"><div class="link-icon">⌨️</div><div><div class="link-title">Project Repository</div><div class="link-url">github.com/cepdnaclk</div></div></a>
+    <a href="http://www.ce.pdn.ac.lk/" class="link-card reveal" target="_blank"><div class="link-icon">🏛️</div><div><div class="link-title">Department of Computer Engineering</div><div class="link-url">ce.pdn.ac.lk</div></div></a>
+    <a href="https://eng.pdn.ac.lk/" class="link-card reveal" target="_blank"><div class="link-icon">🎓</div><div><div class="link-title">University of Peradeniya</div><div class="link-url">eng.pdn.ac.lk</div></div></a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-left">Neuromorphic Smart Sensor for Autonomous Underwater Vehicles<br>Department of Computer Engineering · University of Peradeniya · Sri Lanka</div>
+  <div class="footer-right">E/20/036 · E/20/328 · E/20/377<br>Final Year Project · 2025-2026</div>
+</footer>
+
+<script>
+  // ORIGINAL INTERSECTION OBSERVER FOR CONTENT REVEAL
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+  document.querySelectorAll('.team-grid,.rw-grid,.method-grid,.findings-grid,.contrib-grid,.links-grid').forEach(grid => {
+    grid.querySelectorAll('.reveal').forEach((card, i) => { card.style.transitionDelay = `${i*0.08}s`; });
+  });
+
+  // RANDOM SONAR TARGET GENERATOR
+  function spawnTarget() {
+    const target = document.createElement('div');
+    target.className = 'sonar-target';
+    
+    // Calculate random position within circular bounds
+    const angle = Math.random() * Math.PI * 2;
+    const distance = 10 + Math.random() * 35; // Distance from center
+    
+    // Convert to percentage coordinates
+    const x = 50 + Math.cos(angle) * distance;
+    const y = 50 + Math.sin(angle) * distance;
+    
+    target.style.left = x + '%';
+    target.style.top = y + '%';
+    
+    document.body.appendChild(target);
+    
+    // Clean up DOM after animation completes
+    setTimeout(() => {
+      target.remove();
+    }, 9000);
+  }
+
+  // Initial targets to seed the screen
+  setTimeout(spawnTarget, 1000);
+  setTimeout(spawnTarget, 2500);
+
+  // Continuous spawning loop
+  setInterval(() => {
+    if (Math.random() > 0.4) {
+      spawnTarget();
+    }
+  }, 4000);
+</script>
+</body>
+</html>
