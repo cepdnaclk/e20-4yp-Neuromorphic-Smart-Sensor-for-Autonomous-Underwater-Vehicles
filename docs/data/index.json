@@ -1,5 +1,4 @@
 {
-    "title": "Neuromorphic Smart Sensor For Autonomous Underwater Vehicles",
     "team": [
         {
             "name": "Bandara K.G.R.I.",
@@ -24,6 +23,6 @@
         }
     ],
     "tags": ["Final Year Projects", "Research","AI","Neuromorphic"],
-    "image":"cover_page.jpg",
-    "thumbnail":"thumbnail.jpg"
+    "image": "cover_page.jpg",
+    "thumbnail": "thumbnail.jpg"
 }
