@@ -3,8 +3,8 @@ layout: home
 permalink: index.html
 
 # Please update this with your repository name and title
-repository-name: eYY-4yp-project-template
-title:
+repository-name: e20-4yp-Neuromorphic-Smart-Sensor-for-Autonomous-Underwater-Vehicles
+title:Neuromorphic Smart Sensor for Autonomous Underwater Vehicles
 ---
 
 [comment]: # "This is the standard layout for the project, but you can clean this and use your own template"
